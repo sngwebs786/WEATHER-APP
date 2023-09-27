@@ -1,174 +1,183 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
+import { useEffect, useState } from "react";
 import {
-  Stack,
-  Flex,
-  Button,
-  Text,
-  VStack,
-  useBreakpointValue,
-} from "@chakra-ui/react";
+  MDBCard,
+  MDBCardBody,
+  MDBCol,
+  MDBContainer,
+  MDBIcon,
+  MDBRow,
+  MDBTypography,
+} from "mdb-react-ui-kit";
+import "./Weather.css";
+
+import cloudy from "../img/cloudy.png";
+import rain from "../img/rain.png";
+import partlyCloudy from "../img/partlyCloudy.png";
+import mostlyCloudy from "../img/mostlyCloudy.png";
+import sunny from "../img/sunny.png";
+import sunnyRain from "../img/sunnyrain.png";
+import thunder from "../img/thunderstorm.png";
+import mostlySunny from "../img/mostlySunny.png";
+import mist from "../img/mist.png";
+import snow from "../img/snow.png";
 import { Input } from "@chakra-ui/react";
-import { SearchIcon } from "@chakra-ui/icons";
 import axios from "axios";
+export default function WeatherApp() {
+  //month
+  const month = new Array();
+  month[0] = "January";
+  month[1] = "February";
+  month[2] = "March";
+  month[3] = "April";
+  month[4] = "May";
+  month[5] = "June";
+  month[6] = "July";
+  month[7] = "August";
+  month[8] = "September";
+  month[9] = "October";
+  month[10] = "November";
+  month[11] = "December";
 
-const WeatherApp = () => {
-  let [searchedValue, setSearchedValue] = useState("Karachi");
-  let [cityData, setCityData] = useState([]);
-  let [temp,setTemp]=useState([])
-  let [input, setInput] = useState("");
-  let componentMounted = true;
-  let emoji = null;
+  //day
+  const day = new Array();
+  day[0] = "Monday";
+  day[1] = "Tuesday";
+  day[2] = "Wednesday";
+  day[3] = "Thursday";
+  day[4] = "Friday";
+  day[5] = "Saturday";
+  day[6] = "Sunday";
 
-  async function fetchWeather() {
-    // const axios = require('axios');
-    // if (componentMounted) {
-    //   const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${search}&appid=d54714bf25c67dba81a9cec36deeee35`;
-    //   await axios
-    //     .get(apiUrl)
-    //     .then(async function (res) {
-    //       console.log("response: ", res.data);
+  let today = new Date();
+  let name = month[today.getMonth()];
+  let dayName = day[today.getDay()];
 
-    //       setData(res.data);
+  var date =
+    dayName + ", " + name + " " + today.getDate() + ", " + today.getFullYear();
 
-    //       console.log("data:", data);
-    //     })
-    //     .catch((err) => console.log("err", err));
-    // }
-    console.log("City name", searchedValue);
-    const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${searchedValue}&appid=d54714bf25c67dba81a9cec36deeee35`;
-    axios
-      .get(apiUrl)
-      .then((res) => {
-        console.log(res.data.main);
-        setCityData(res.data.weather[0])
-        setTemp(res.data.main)
-      })
-      .catch((err) => console.log(err));
-    return () => {
-      componentMounted = false;
-    };
-  }
+  //Api
+  const [cityData, setCityData] = useState();
+  const [icon, setIcon] = useState("04d");
+  const [city, setCity] = useState("Karachi");
+  const [imgs, setImage] = useState("sunny");
 
   useEffect(() => {
-    // console.log("useEffect working");
-    fetchWeather();
+    const fetchApi = async () => {
+      const axios = require("axios");
 
-    // if (typeof data.main != "undefine") {
-    //   if (data.weather[0].main === "Clouds") {
-    //     emoji = "fa-cloud";
-    //   } else if (data.weather[0].main === "Thunderstorm") {
-    //     emoji = "fa-bolt";
-    //   } else if (data.weather[0].main === "Drizzle") {
-    //     emoji = "fa-cloud-rain";
-    //   } else if (data.weather[0].main === "Rain") {
-    //     emoji = "fa-cloud-shower-heavy";
-    //   } else if (data.weather[0].main === "Snow") {
-    //     emoji = "fa-snow-flake";
-    //   } else {
-    //     emoji = "fa-smog";
-    //   }
-    // } else {
-    //   return <div>Loading...</div>;
-    // }
-    console.log(emoji);
-  }, [searchedValue]);
+      axios
+        .get(
+          `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=d54714bf25c67dba81a9cec36deeee35`
+        )
+        .then(function (response) {
+          // handle success
+          setCityData(response.data);
+          console.log(cityData);
+          setIcon(cityData.weather[0].icon);
+          console.log(icon);
+          if (icon == "01d" || icon == "01n") {
+            setImage(sunny);
+          } else if (icon == "02d" || icon == "02n") {
+            setImage(mostlySunny);
+          } else if (icon == "03d" || icon == "03n") {
+            setImage(cloudy);
+          } else if (icon == "04d" || icon == "04n") {
+            setImage(mostlyCloudy);
+          } else if (icon == "09d" || icon == "09n") {
+            setImage(rain);
+          } else if (icon == "10d" || icon == "10n") {
+            setImage(sunnyRain);
+          } else if (icon == "11d" || icon == "11n") {
+            setImage(thunder);
+          } else if (icon == "13d" || icon == "13n") {
+            setImage(snow);
+          } else if (icon == "50d" || icon == "50n") {
+            setImage(mist);
+          }
+        })
+        .catch(function (error) {
+          // handle error
+          console.log(error);
+        })
+        .then(function () {
+          // always executed
+        });
+    };
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    setSearchedValue(input);
-    console.log(input);
-  };
+    fetchApi();
+  }, [city]);
 
   const kelToCel = (abc) => {
     return (abc - 273.15).toFixed(2);
   };
-
   return (
-    <div>
-      <Flex
-        w={"full"}
-        h={"100vh"}
-        backgroundImage={
-          "url(https://source.unsplash.com/600x900/?nature,rain)"
-        }
-        backgroundSize={"cover"}
-        backgroundPosition={"center center"}
-      >
-        <VStack
-          w={"full"}
-          justify={"center"}
-          px={useBreakpointValue({ base: 4, md: 8 })}
-          bgGradient={"linear(to-r, blackAlpha.600, transparent)"}
-        >
-          <span>
-            {/* <form onSubmit={handleSubmit}> */}
-            <Input
-              placeholder="Enter City "
-              width="auto"
-              color={"white"}
-              className="myinp"
-              name="search"
-              value={searchedValue}
-              onChange={(e) => setSearchedValue(e.target.value)}
-            ></Input>
+    <section className="vh-100 weather_main">
+      <MDBContainer className="h-100">
+        <MDBRow className="justify-content-center align-items-center h-100">
+          <MDBCol md="8" lg="6" xl="4">
+            <MDBCard style={{ color: "#4B515D", borderRadius: "35px" }}>
+              <MDBCardBody className="p-4">
+                <Input
+                  onChange={(e) => setCity(e.target.value)}
+                  placeholder="Enter City name"
+                  name="search"
+                />
 
-            <Button
-              leftIcon={<SearchIcon />}
-              colorScheme="teal"
-              variant="solid"
-              marginLeft={5}
-              type="submit"
-            ></Button>
-            {/* </form> */}
-          </span>
-          <Stack
-            height={"500px"}
-            width={"300px"}
-            spacing={6}
-            textAlign={"center"}
-            bg={"blackAlpha.500"}
-            color={"white"}
-          >
-            <Text
-              textAlign={"center"}
-              color={"white"}
-              fontWeight={700}
-              lineHeight={1.2}
-              padding={"20px"}
-            >
-              {/* <Text fontSize={useBreakpointValue({ base: "3xl", md: "4xl" })}>
-                {cityData.name}
-              </Text> */}
-              {/* <p>{cityData.weather[0].description}</p> */}
-              <Text fontSize={useBreakpointValue({ base: "3xl", md: "4xl" })}>
-                {searchedValue}
-              </Text>{" "}
-              <br />
-              <p>{cityData.description}</p>
-              <br />
-              {/* <i className={`fas ${emoji} fa-3x`}></i> */}
-              <hr />
-              <h1>{kelToCel(temp.temp)}&deg;C</h1>
-              {/* <h1>{kelToCel(cityData.main.temp)}&deg;C</h1> */}
-            </Text>
+                {cityData ? (
+                  <>
+                    <div className="d-flex flex-column text-center mt-5 mb-4">
+                      <MDBTypography
+                        className="display-4 mb-0 font-weight-bold"
+                        style={{ color: "#1C2331", fontSize: "40px" }}
+                      >
+                        {city}
+                      </MDBTypography>
+                      <MDBTypography
+                        className="display-4 mb-0 font-weight-bold"
+                        style={{ color: "#1C2331", fontSize: "20px" }}
+                      >
+                        {date}
+                      </MDBTypography>
+                      <MDBTypography
+                        tag="h6"
+                        className="display-4 mb-0 font-weight-bold"
+                        style={{ color: "#1C2331" }}
+                      >
+                        {kelToCel(cityData.main.temp)} &deg;C
+                      </MDBTypography>
+                      <span
+                        className="small"
+                        style={{ color: "#868B94", fontSize: "25px" }}
+                      >
+                        {cityData.weather[0].main}
+                      </span>
+                    </div>
 
-            {/* <p className='para'>Feels Like: {kelToCel(cityData.main.feels_like)}&deg;C</p>
-            <p className='para'>Minimum Temperature: {kelToCel(cityData.main.temp_min)}&deg;C</p>
-            <p className='para'>Mazimum Temperature: {kelToCel(cityData.main.temp_max)}&deg;C</p> */}
-            <p className="para">
-              Feels Like: {kelToCel(temp.feels_like)}&deg;C
-            </p>
-            <p className="para">
-              Minimum Temperature: {kelToCel(temp.temp_min)}&deg;C
-            </p>
-            <p className="para">
-              Mazimum Temperature: {kelToCel(temp.temp_max)}&deg;C
-            </p>
-          </Stack>
-        </VStack>
-      </Flex>
-    </div>
+                    <div className="d-flex align-items-center">
+                      <div className="flex-grow-1" style={{ fontSize: "1rem" }}>
+                        <div style={{ fontSize: "20px" }}>
+                          Feels like:
+                          <span className="ms-1">
+                            <b>{kelToCel(cityData.main.feels_like)} &deg;C</b>
+                          </span>
+                        </div>
+                      </div>
+                      <div>
+                        <img src={imgs} width="100px" />
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <p>Sorry! No Data Found</p>
+                  </>
+                )}
+              </MDBCardBody>
+            </MDBCard>
+          </MDBCol>
+        </MDBRow>
+      </MDBContainer>
+    </section>
   );
-};
-
-export default WeatherApp;
+}
